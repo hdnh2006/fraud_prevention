@@ -1,0 +1,17 @@
+# EDA libraries
+pandas>=2.0.1
+seaborn>=0.12.2
+matplotlib>=3.7.1
+
+# ML libraries
+scikit-learn>=1.2.2
+torch>=2.0
+xgboost
+keras-core
+
+
+# SMOTE library
+imblearn
+
+# editor
+spyder-kernels==2.4.*
