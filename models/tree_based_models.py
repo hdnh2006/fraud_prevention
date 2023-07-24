@@ -99,6 +99,7 @@ def main(args):
     if not args.avoid_optimize:
         logging.warning('⚠️ ⚠️ ⚠️ ALERT! This process can take more than one hour even in GPU')
         best_params = tree_cls.get_best_params(X_train, y_train) # It apply XGBoost
+        logging.info(f'These are the best hyperparameters for the dataset provided: \n {best_params}')
     else:
         logging.warning('🟢🟢🟢 Using the best hyperparameters gotten in the past')
         
@@ -115,13 +116,14 @@ def main(args):
     
     # Explainability using SHAP and feature importance
     logging.info('🟢🟢🟢 Looking for explainability of the model')
+    tree_cls.SHAP_explain(xgb_best, name_model='xgboost')
     
     
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Perform EDA on transaction and labels data. Output: report plots and data_processed")
     parser.add_argument('--data-processed', type=str, help='Path to transaction data CSV file.', default= ROOT / 'data/processed/data_processed.csv')
-    parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'featurespace-models')
+    parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'autoencoder')
     parser.add_argument('--out-plots', type=str, help='Path save plots', default = ROOT / 'reports/eda')
     parser.add_argument('--avoid-optimize',  action='store_true', help='If you want to get the best hyperparameters (Alert! it will take a long time even in GPU)')
     args = parser.parse_args()

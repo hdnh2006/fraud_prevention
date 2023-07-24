@@ -140,11 +140,38 @@ def plot_SHAP_and_importance(model, X_test, output_dir):
         logging.info("Starting to plot feature importance...")
         feature_importances.plot(kind='barh', x='Feature', y='Importance', legend=False)
         plt.title('Feature Importance')
-        plt.savefig(os.path.join(output_dir, 'feature_importance_plot.png'))
-        logging.info("Feature importance plotted and saved.")
+        path_out = os.path.join(output_dir, 'feature_importance_plot.png')
+        plt.savefig(path_out)
+        logging.info(f'Feature importance plotted and saved in {path_out}')
 
     except Exception as e:
         logging.error(f'Error occurred: {e}')
-    
+
+
+def plot_history(history, path_save):
+
+    try:
+        # Create output dir
+        path_save = Path(path_save)
+        path_save.mkdir(parents=True, exist_ok=True)  # make dir
+        
+        logging.info("Plotting history of training...")
+
+        # Plot history
+        plt.figure(figsize=(12,6))
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('Model loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['Train', 'Validation'], loc='upper right')
+
+        # Save plot
+        path_out = os.path.join(path_save, 'history_loss.png')
+        plt.savefig(path_out)
+        logging.info(f'History training saved in {path_out}')
+
+    except Exception as e:
+        logging.error(f'Error occurred: {e}')
 
     
