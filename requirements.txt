@@ -12,6 +12,8 @@ keras-core
 # Explainability
 shap
 
+# Track experiments
+wandb
 
 # SMOTE library
 imblearn
