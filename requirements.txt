@@ -9,6 +9,9 @@ torch>=2.0
 xgboost
 keras-core
 
+# Explainability
+shap
+
 
 # SMOTE library
 imblearn
