@@ -11,3 +11,28 @@ This directory contains all the machine learning models used in the project.
 
 * `train_autoencoder.py` - This script is responsible for training an autoencoder neural network model. The model is defined, compiled, and trained in this script. It takes in a preprocessed dataset, trains the model, and saves the trained model.
 
+```
+.
+├── EDA
+│   ├── eda.py
+│   └── preprocess.py
+├── Models
+│   ├── tree_based_models.py
+│   ├── train_xgboost.py
+│   └── train_autoencoder.py
+├── Deployment
+│   ├── app.py
+│   └── Dockerfile
+├── Utils
+│   ├── utils.py
+│   └── Dockerfile
+├── Tests
+│   └── test_utils.py
+├── Reports
+│   └── final_report.pdf
+└── Data
+    ├── raw
+    └── processed
+
+
+```
