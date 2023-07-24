@@ -1,19 +1,21 @@
 # EDA libraries
-pandas>=2.0.1
-seaborn>=0.12.2
-matplotlib>=3.7.1
+pandas==2.0.3
+seaborn==0.12.2
+matplotlib==3.7.1
+numpy==1.24.3
 
 # ML libraries
-scikit-learn>=1.2.2
-torch>=2.0
-xgboost
-keras-core
+scikit-learn==1.3.0
+torch===2.0.1
+xgboost==1.7.6
+keras-core==0.1.2
+tensorflow==2.13.0
 
 # Explainability
-shap
+shap==0.42.1
 
 # Track experiments
-wandb
+wandb==0.15.5
 
 # SMOTE library
 imblearn

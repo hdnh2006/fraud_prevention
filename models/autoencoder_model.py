@@ -66,44 +66,58 @@ def main(args):
     autoencoder = train_autoencoder(X_train, y_train, X_test, y_test, project= args.wandb_project)
     
     # Dataset assigned is scaled so the model will be able to read it
-    autoencoder.scale_dataset()
+    logging.info('Scaling dataset')
+    autoencoder.scale_dataset(args)
     
     # Train the autoencoder with pre-set architecture
+    logging.info('🟢🟢🟢 Training Autoencoder neural network.')
     autoencoder.train(args)
     
     # Find best threshold
+    logging.info('🟢🟢🟢 Finding the best cutoff for prediction')
     autoencoder.find_best_cutoff()
     
     # Predict
-    autoencoder.classify()
+    logging.info('Testing the cutoff in test dataset')
+    autoencoder.classify(args)
     
     
     # Retrain with SMOTE
-    logging.info('🟢🟢🟢 Training eXtreme Gradient Boosting machine with SMOTE data')
+    logging.info('🟢🟢🟢 Training Autoencoder neural network with SMOTE data')
     autoencoder.X_train, autoencoder.y_train = apply_SMOTE(X_train, y_train)
-    args.epochs = 300
+    
+    logging.info('Dataset bigger so the data will be passed 3 times the number of epochs initially set')
+    args.epochs = args.epochs*3
     
     # Dataset assigned is scaled so the model will be able to read it
-    autoencoder.scale_dataset()
+    logging.info('Scaling the new dataset with SMOTE')
+    autoencoder.scale_dataset(args)
     
     # Train the autoencoder with pre-set architecture
+    logging.info('🟢🟢🟢 Training the neural network with SMOTE data')
     autoencoder.train(args)
     
     # Find best threshold
+    logging.info('🟢🟢🟢 Finding the best cutoff for prediction with SMOTE dataset')
     autoencoder.find_best_cutoff()
     
-    # Predict
-    autoencoder.classify()
-
-
+    # Predict X_test
+    logging.info('Testing the cutoff in test dataset with model trained using SMOTE')
+    autoencoder.classify(args)
     
+    # Saving model
+    logging.info('🟢🟢🟢 The false positives values are reduced so we will save this model')
+    path_save = Path(args.output_model)
+    path_save.mkdir(parents=True, exist_ok=True)  # make dir
+    path_out = os.path.join(path_save, 'autoencoder.keras')
+    autoencoder.autoencoder.save(path_out)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Perform EDA on transaction and labels data. Output: report plots and data_processed")
     parser.add_argument('--data-processed', type=str, help='Path to transaction data CSV file.', default= ROOT / 'data/processed/data_processed.csv')
     parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'autoencoder')
     parser.add_argument('--name', type=str, help='Name of the experiment in wandb')
-    parser.add_argument('--out-plots', type=str, help='Path save plots', default = ROOT / 'reports/eda')
+    parser.add_argument('--output-model', type=str, help='Path save plots', default = ROOT / 'models/pretrained/autoencoder')
     parser.add_argument('--batch-size', type=int, default=4096, help='total batch size for all GPUs')
     parser.add_argument('--epochs', type=int, default=100, help='total training epochs')
     parser.add_argument('--patience', type=int, default=20, help='EarlyStopping patience (epochs without improvement)')

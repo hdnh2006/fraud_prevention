@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from models_utils.train_utils import train_tree_cls
+from models_utils.train_utils import train_tree_cls, apply_SMOTE
 from sklearn.preprocessing import LabelEncoder
 
 
@@ -88,7 +88,7 @@ def main(args):
     
     # Retrain with SMOTE
     logging.info('🟢🟢🟢 Training eXtreme Gradient Boosting machine with SMOTE data')
-    X_train_smote, y_train_smote = tree_cls.apply_SMOTE()
+    X_train_smote, y_train_smote = apply_SMOTE(X_train, y_train)
     tree_cls.X_train = X_train_smote
     tree_cls.y_train = y_train_smote
     xgb_smote = tree_cls.train_XGBoost('XGBoost-SMOTE')
@@ -123,7 +123,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Perform EDA on transaction and labels data. Output: report plots and data_processed")
     parser.add_argument('--data-processed', type=str, help='Path to transaction data CSV file.', default= ROOT / 'data/processed/data_processed.csv')
-    parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'autoencoder')
+    parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'tree-based-models')
     parser.add_argument('--out-plots', type=str, help='Path save plots', default = ROOT / 'reports/eda')
     parser.add_argument('--avoid-optimize',  action='store_true', help='If you want to get the best hyperparameters (Alert! it will take a long time even in GPU)')
     args = parser.parse_args()

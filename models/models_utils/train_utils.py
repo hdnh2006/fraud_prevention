@@ -12,6 +12,7 @@ import io
 import contextlib
 import wandb
 import shap
+import joblib
 import numpy as np
 from pathlib import Path
 from imblearn.over_sampling import SMOTE
@@ -172,6 +173,8 @@ class train_tree_cls:
             }
         
         try:
+            # Start a wandb run
+            run = wandb.init(project=self.project, name = name)
             
             # Attempt to xgboost on GPU with default hyperparametersfrom wandb.keras import WandbCallback
 
@@ -204,43 +207,14 @@ class train_tree_cls:
             # Plot metrics for rf
             plot_metrics(xgb, self.X_test, self.y_test, ROOT / 'reports/xgboost' )
             
+            # Close your wandb run
+            run.finish()
+            
             return xgb        
             
         except Exception as e:
             logging.error(f'An Error has occured: {e}')
-        
-    
-    
-    def apply_SMOTE(self):
-        
-        """
-        Applies Synthetic Minority Over-sampling Technique (SMOTE) to the training data.
-
-        Returns
-        -------
-        X_train_smote : pandas.DataFrame
-            The training data features after applying SMOTE.
-        y_train_smote : pandas.Series
-            The training data target variable after applying SMOTE.
-        """
-        
-        try:
-            # Initialize SMOTE
-            smote = SMOTE(random_state=42)
-        
-            # Fit SMOTE on the training data
-            self.X_train_smote, self.y_train_smote = smote.fit_resample(self.X_train, self.y_train)
-        
-            # Check the number of fraudulent and non-fraudulent transactions after SMOTE
-            logging.info(f'After apply SMOTE, the new sample is distributed like this: \n {self.y_train_smote.value_counts()}')
             
-            return self.X_train_smote, self.y_train_smote
-        
-        except Exception as e:
-            logging.error(f'An Error has occured: {e}')
-        
-    
-    
     def get_best_params(self):
         
         """
@@ -335,7 +309,7 @@ class train_autoencoder:
         self.y_test = y_test
         self.project = project
     
-    def scale_dataset(self):
+    def scale_dataset(self, args):
    
         # Initialize a MinMaxScaler
         scaler = StandardScaler()
@@ -349,13 +323,15 @@ class train_autoencoder:
         # Split the training data into non-fraudulent and fraudulent transactions
         self.X_train_non_fraud = self.X_train_scaled[self.y_train == 0]
         self.X_train_fraud = self.X_train_scaled[self.y_train == 1]
-        
-        # Check the number of non-fraudulent and fraudulent transactions
-        logging.info(f'These are the number of transactions: \n {self.X_train_non_fraud.shape}, {self.X_train_fraud.shape}')
-        
+                
         self.y_train_nonfraud = self.y_train[self.y_train == 0]
         
-    
+        # Export the scaler
+        path_save = Path(args.output_model)
+        path_save.mkdir(parents=True, exist_ok=True)  # make dir
+        path_out = os.path.join(path_save,'scaler.pkl')
+        joblib.dump(scaler, path_out)
+  
     
     def train(self, args):
         
@@ -451,14 +427,12 @@ class train_autoencoder:
         # Find the optimal threshold: the one that maximizes accuracy
         optimal_idx = np.argmax(accuracies)
         self.cutoff = thresholds[optimal_idx]
-        print(accuracies)
-        logging.info(f"""Best metrics: \n
-                     Threshold: {self.cutoff}""")
+        logging.info(f"""Best threshold: {self.cutoff}""")
 
         
 
     
-    def classify(self):
+    def classify(self, args):
     
         
         # train_predicted_x = self.autoencoder.predict(x=self.X_train_scaled)
@@ -471,14 +445,13 @@ class train_autoencoder:
 
         # pred_test = (abnormal_events_mse.cpu().numpy() > cut_off).astype(int)
         
-        
         logging.info('Evaluating test dataset')
         
         # Evaluating test dataset
         probs = self.autoencoder.predict(self.X_test_scaled, batch_size=4096)
         y_pred = np.where(probs >= self.cutoff, 1, 0)
 
-        print(confusion_matrix(self.y_test, y_pred))
+        logging.info(f'Confusion Matrix for this model: {confusion_matrix(self.y_test, y_pred)}')
 
 
 def apply_SMOTE(X_train, y_train):
