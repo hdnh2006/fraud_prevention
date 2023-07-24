@@ -11,6 +11,7 @@ import logging
 import sys
 import os
 import time
+import joblib
 from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -52,15 +53,16 @@ def main(args):
     data = pd.read_csv(args.data_processed)
     
     # Initialize a label encoder
-    le = LabelEncoder()
+    le_dict = {}
     
     # List of categorical columns to encode
     cat_cols = ['accountNumber', 'merchantId', 'mcc', 'merchantCountry', 'posEntryMode']
     
     # Encode each column
     for col in cat_cols:
+        le = LabelEncoder()
         data[col] = le.fit_transform(data[col])
-    
+        le_dict[col] = le  # store the encoder 
     
     # Separate the features (X) and the target variable (y)
     X = data.drop(['transactionTime', 'isFraud'], axis=1)
@@ -112,6 +114,14 @@ def main(args):
                       'subsample': 1.0}
     
     xgb_best = tree_cls.train_XGBoost(name= 'XGBoost-best-params', params = best_params)
+    path_save = Path(args.output_model)
+    path_save.mkdir(parents=True, exist_ok=True)  # make dir
+    path_out = os.path.join(path_save, 'xgboost.joblib')
+    # Save the model
+    joblib.dump(xgb_best, path_out)
+    # Save encoder
+    path_out = os.path.join(path_save, 'label_encoders.pkl')
+    joblib.dump(le_dict, path_out)
     
     
     # Explainability using SHAP and feature importance
@@ -125,6 +135,7 @@ if __name__ == "__main__":
     parser.add_argument('--data-processed', type=str, help='Path to transaction data CSV file.', default= ROOT / 'data/processed/data_processed.csv')
     parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'tree-based-models')
     parser.add_argument('--out-plots', type=str, help='Path save plots', default = ROOT / 'reports/eda')
+    parser.add_argument('--output-model', type=str, help='Path save the model', default = ROOT / 'models/pretrained/xgboost')
     parser.add_argument('--avoid-optimize',  action='store_true', help='If you want to get the best hyperparameters (Alert! it will take a long time even in GPU)')
     args = parser.parse_args()
     main(args)

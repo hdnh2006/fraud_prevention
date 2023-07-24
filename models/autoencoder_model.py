@@ -10,6 +10,7 @@ import argparse
 import logging
 import sys
 import os
+import joblib
 from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -42,14 +43,19 @@ def main(args):
     data = pd.read_csv(args.data_processed)
     
     # Initialize a label encoder
-    le = LabelEncoder()
+    le_dict = {}
     
     # List of categorical columns to encode
     cat_cols = ['accountNumber', 'merchantId', 'mcc', 'merchantCountry', 'posEntryMode']
     
     # Encode each column
     for col in cat_cols:
+        le = LabelEncoder()
         data[col] = le.fit_transform(data[col])
+        le_dict[col] = le  # store the encoder
+    
+    # Now you can save all encoders to a file
+    joblib.dump(le_dict, 'label_encoders.pkl')
     
     
     # Separate the features (X) and the target variable (y)
@@ -117,7 +123,7 @@ if __name__ == "__main__":
     parser.add_argument('--data-processed', type=str, help='Path to transaction data CSV file.', default= ROOT / 'data/processed/data_processed.csv')
     parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'autoencoder')
     parser.add_argument('--name', type=str, help='Name of the experiment in wandb')
-    parser.add_argument('--output-model', type=str, help='Path save plots', default = ROOT / 'models/pretrained/autoencoder')
+    parser.add_argument('--output-model', type=str, help='Path save the model', default = ROOT / 'models/pretrained/autoencoder')
     parser.add_argument('--batch-size', type=int, default=4096, help='total batch size for all GPUs')
     parser.add_argument('--epochs', type=int, default=100, help='total training epochs')
     parser.add_argument('--patience', type=int, default=20, help='EarlyStopping patience (epochs without improvement)')

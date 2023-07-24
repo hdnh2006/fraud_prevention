@@ -1,3 +1,5 @@
+# Usage: pip install -r requirements.txt
+
 # EDA libraries
 pandas==2.0.3
 seaborn==0.12.2
@@ -19,6 +21,9 @@ wandb==0.15.5
 
 # SMOTE library
 imblearn
+
+# Deployment
+Flask==2.3.2
 
 # editor
 spyder-kernels==2.4.*

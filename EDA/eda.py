@@ -153,13 +153,16 @@ def process_data(data):
         logging.info("Column {} has {} missing values".format(column, num_missing))
     
     # Drop the 'merchantZip' column, due to the number of NA's values
-    data = data.drop('merchantZip', axis=1)
+    if 'merchantZip' in data.columns:
+        data = data.drop('merchantZip', axis=1)
     
     # Drop the 'eventId' column
-    data = data.drop('eventId', axis=1)
+    if 'merchantZip' in data.columns:
+        data = data.drop('eventId', axis=1)
     
     # Drop the 'reportedTime' column as it's no longer needed
-    data = data.drop('reportedTime', axis=1)
+    if 'merchantZip' in data.columns:
+        data = data.drop('reportedTime', axis=1)
     
     logging.info("Completed data processing.")
     
