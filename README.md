@@ -51,6 +51,16 @@ Use a virtual environment for this purpose
 pip install -r requirements.txt
 ```
 
+### 2. Run the exploratory data analysis
+To start understanding the nature of the data and to guide your future preprocessing steps, you should first run a thorough exploratory data analysis (EDA). In this project, we've prepared a dedicated script for this purpose.
+
+To execute the EDA script, simply run the following command:
+```
+python eda.py
+```
+* `eda.py` - This script is responsible for conducting exploratory data analysis (EDA) on the provided transactional data. It reads the raw data, performs various statistical and graphical analysis operations, and outputs the results as a PDF report. It also handles preprocessing tasks such as encoding categorical variables and scaling numerical ones.
+
+
 ### 2. Train tree based model
 
 This will provide you a XGBoost model with the best possible performance

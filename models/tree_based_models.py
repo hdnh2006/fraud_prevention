@@ -132,10 +132,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Perform EDA on transaction and labels data. Output: report plots and data_processed")
-    parser.add_argument('--data-processed', type=str, help='Path to transaction data CSV file.', default= ROOT / 'data/processed/data_processed.csv')
+    parser.add_argument('--data-processed', type=str, help='Path to transaction data CSV file.', default=  'data/processed/data_processed.csv')
     parser.add_argument('--wandb-project', type=str, help='Name of the project in wandb', default = 'tree-based-models')
-    parser.add_argument('--out-plots', type=str, help='Path save plots', default = ROOT / 'reports/eda')
-    parser.add_argument('--output-model', type=str, help='Path save the model', default = ROOT / 'models/pretrained/xgboost')
+    parser.add_argument('--out-plots', type=str, help='Path save plots', default =  'reports/eda')
+    parser.add_argument('--output-model', type=str, help='Path save the model', default =  'models/pretrained/xgboost')
     parser.add_argument('--avoid-optimize',  action='store_true', help='If you want to get the best hyperparameters (Alert! it will take a long time even in GPU)')
     args = parser.parse_args()
     main(args)

@@ -39,8 +39,8 @@ logging.basicConfig(
 
 # Arguments
 parser = argparse.ArgumentParser(description='Flask API to deploy pretrained models')
-parser.add_argument('--xgboost', default = ROOT / 'models/pretrained/xgboost/xgboost.joblib', help='Path to the XGBoost model')
-parser.add_argument('--autoencoder', default = ROOT / 'models/pretrained/autoencoder/autoencoder.keras', help='Path to the Autoencoder model')
+parser.add_argument('--xgboost', default =  'models/pretrained/xgboost/xgboost.joblib', help='Path to the XGBoost model')
+parser.add_argument('--autoencoder', default =  'models/pretrained/autoencoder/autoencoder.keras', help='Path to the Autoencoder model')
 parser.add_argument('--debug', action='store_true', help='Run in debug mode')
 parser.add_argument('--host', default='0.0.0.0', help='Host to run on')
 parser.add_argument('--port', default=5000, help='Port to run on')
@@ -53,13 +53,19 @@ app = Flask(__name__)
 if args.autoencoder != "":
     autoencoder = load_model(args.autoencoder)
     
+    # Load the dictionary of encoders
+    le_dict_NN = joblib.load(os.path.join(os.path.split(args.autoencoder)[0],'label_encoders.pkl'))
+    
+    # Load scaler
+    scaler = joblib.load(os.path.join(os.path.split(args.autoencoder)[0], 'scaler.pkl'))
+    
 
 # Load XGboost
 if args.xgboost != "":
     xgboost_model = joblib.load(args.xgboost)
     
     # Load the dictionary of encoders
-    le_dict_loaded = joblib.load(os.path.join(os.path.split(args.xgboost)[0],'label_encoders.pkl'))
+    le_dict_xgb = joblib.load(os.path.join(os.path.split(args.xgboost)[0],'label_encoders.pkl'))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -69,34 +75,42 @@ def upload_predict():
         if csv_file is not None:
             data = pd.read_csv(csv_file)
             data = process_data(data)
-            
-            
-            
+            # Drop date transaction
+            data = data.drop(['transactionTime'], axis=1)
             cat_cols = ['accountNumber', 'merchantId', 'mcc', 'merchantCountry', 'posEntryMode']
-            # Load the dictionary of encoders
-            
-            # Suppose we have some new data in a DataFrame `data_new`
-            # We can transform it using the loaded encoders
-            for col in cat_cols:
-                print(col)
-                le = le_dict_loaded[col]
-                data[col] = le.transform(data[col])
-            
-            
-            # Preprocess data here, if needed
-            # Make predictions
-            autoencoder_predictions = autoencoder.predict(data)
-            
-            
-            # List of categorical columns to encode
+
+
+            if args.xgboost != "":
+                
+                # Load the dictionary of encoders
+                for col in cat_cols:
+                    print(col)
+                    le = le_dict_xgb[col]
+                    data[col] = le.transform(data[col])
+                    
+                # make predictions
+                xgboost_predictions = xgboost_model.predict(data)
             
             
-            xgboost_predictions = xgboost_model.predict(data)
+            if args.autoencoder != "":
+                # Load the dictionary of encoders
+                for col in cat_cols:
+                    print(col)
+                    le = le_dict_NN[col]
+                    data[col] = le.transform(data[col])
+
+                # Transform data
+                data_scaled = scaler.transform(data)
+    
+                autoencoder_predictions = autoencoder.predict(data_scaled)
+                        
+            
             # Combine predictions into a single DataFrame
             results = pd.DataFrame({
                 'Autoencoder Predictions': autoencoder_predictions,
                 'XGBoost Predictions': xgboost_predictions
             })
+            
             # Save to CSV
             results.to_csv('predictions.csv', index=False)
             return send_file('predictions.csv', as_attachment=True)

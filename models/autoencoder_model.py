@@ -54,9 +54,11 @@ def main(args):
         data[col] = le.fit_transform(data[col])
         le_dict[col] = le  # store the encoder
     
-    # Now you can save all encoders to a file
-    joblib.dump(le_dict, 'label_encoders.pkl')
-    
+    # Now save all encoders
+    path_save = Path(args.output_model)
+    path_save.mkdir(parents=True, exist_ok=True)  # make dir
+    path_out = os.path.join(path_save, 'label_encoders.pkl')
+    joblib.dump(le_dict, path_out)
     
     # Separate the features (X) and the target variable (y)
     X = data.drop(['transactionTime', 'isFraud'], axis=1)
@@ -86,7 +88,6 @@ def main(args):
     # Predict
     logging.info('Testing the cutoff in test dataset')
     autoencoder.classify(args)
-    
     
     # Retrain with SMOTE
     logging.info('🟢🟢🟢 Training Autoencoder neural network with SMOTE data')

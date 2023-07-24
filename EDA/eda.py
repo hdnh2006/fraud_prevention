@@ -47,6 +47,10 @@ def plot_data(data, out_plots):
     
     logging.info("Starting report plots")
     
+    # Create directory
+    path_save = Path(out_plots)
+    path_save.mkdir(parents=True, exist_ok=True)  # make dir
+    
     # Set the style of seaborn
     sns.set_style("whitegrid")
         
@@ -155,14 +159,17 @@ def process_data(data):
     # Drop the 'merchantZip' column, due to the number of NA's values
     if 'merchantZip' in data.columns:
         data = data.drop('merchantZip', axis=1)
+        logging.info('\'merchantZip\' variable dropped')
     
     # Drop the 'eventId' column
-    if 'merchantZip' in data.columns:
+    if 'eventId' in data.columns:
         data = data.drop('eventId', axis=1)
+        logging.info('\'eventId\' variable dropped')
     
     # Drop the 'reportedTime' column as it's no longer needed
-    if 'merchantZip' in data.columns:
+    if 'reportedTime' in data.columns:
         data = data.drop('reportedTime', axis=1)
+        logging.info('\'reportedTime\' variable dropped')
     
     logging.info("Completed data processing.")
     
@@ -217,7 +224,7 @@ if __name__ == "__main__":
     parser.add_argument('--data-path', type=str, help='Path to transaction data CSV file.', default= ROOT / 'data/raw/transactions_obf.csv')
     parser.add_argument('--labels-path', type=str, help='Path to labels data CSV file.', default = ROOT / 'data/raw/labels_obf.csv')
     parser.add_argument('--out-data', type=str, help='Path to labels data CSV file.', default = ROOT / 'data/processed/data_processed.csv')
-    parser.add_argument('--out-plots', type=str, help='Path save plots', default = ROOT / 'reports/eda')
+    parser.add_argument('--out-plots', type=str, help='Path to save plots', default = ROOT / 'reports/eda')
     parser.add_argument('--avoid-plots',  action='store_true', help='Do not save plots. If not, plots will be saved in report folder')
     args = parser.parse_args()
     main(args)

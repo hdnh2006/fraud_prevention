@@ -451,7 +451,7 @@ class train_autoencoder:
         probs = self.autoencoder.predict(self.X_test_scaled, batch_size=4096)
         y_pred = np.where(probs >= self.cutoff, 1, 0)
 
-        logging.info(f'Confusion Matrix for this model: {confusion_matrix(self.y_test, y_pred)}')
+        logging.info(f'Confusion Matrix for this model: \n {confusion_matrix(self.y_test, y_pred)}')
 
 
 def apply_SMOTE(X_train, y_train):
