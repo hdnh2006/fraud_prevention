@@ -17,6 +17,25 @@ python autoencoder_model.py --data-processed <path_to_data> --wandb-project <wan
 ```
 
 
+Certainly, here are more detailed descriptions for the command-line arguments for each script:
+
+1. autoencoder_model.py
+Usage:
+
+bash
+Copy code
+python autoencoder_model.py --data-processed <path_to_data> --wandb-project <wandb_project_name> --name <experiment_name> --output-model <model_output_path> --batch-size <batch_size> --epochs <number_of_epochs> --patience <early_stopping_patience>
+Where:
+
+- `data-processed`: Specifies the path to the preprocessed data CSV file. The default value is 'data/processed/data_processed.csv'.
+- `wandb-project`: Specifies the name of the project in Weights & Biases. The default value is 'autoencoder'.
+- `name`: Specifies the name of the experiment in Weights & Biases.
+- `output-model`: Specifies the path to save the trained model. The default value is 'models/pretrained/autoencoder'.
+- `batch-size`: Specifies the total batch size for all GPUs. The default value is 4096.
+- `epochs`: Specifies the total number of training epochs. The default value is 100.
+- `patience`: Specifies the EarlyStopping patience (number of epochs without improvement). The default value is 20.
+
+
 ## 2. tree_based_models.py
 This script trains tree-based models, specifically a Random Forest classifier and an XGBoost model. The script also uses SMOTE to address class imbalance issues. The XGBoost model is retrained using SMOTE data and the best hyperparameters for the model are optimized. The script also provides an explainability analysis using SHAP.
 
