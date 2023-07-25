@@ -77,11 +77,21 @@ if args.autoencoder != "":
     try: 
         autoencoder = load_model(args.autoencoder)
         
+        autoencoder_path = os.path.split(args.autoencoder)[0]
+        
         # Load the dictionary of encoders
-        le_dict_NN = joblib.load(os.path.join(os.path.split(args.autoencoder)[0],'label_encoders.pkl'))
+        le_dict_NN = joblib.load(os.path.join(autoencoder_path,'label_encoders.pkl'))
         
         # Load scaler
-        scaler = joblib.load(os.path.join(os.path.split(args.autoencoder)[0], 'scaler.pkl'))
+        scaler = joblib.load(os.path.join(autoencoder_path, 'scaler.pkl'))
+        
+        # Load optimal cutoff
+        with open(os.path.join(autoencoder_path, 'cutoff.txt'), 'r') as f:
+            cutoff = f.read()
+            
+        cutoff = float(cutoff) 
+        
+        
     except Exception as e:
         logging.error(f'An error has occured: {e}')
     
@@ -145,7 +155,7 @@ def upload_predict():
                     # Transform data and predict
                     data_scaled = scaler.transform(data_autoencoder)   
                     probs = autoencoder.predict(data_scaled, batch_size=1000)
-                    autoencoder_predictions = np.where(probs >= 0.5, 1, 0)
+                    autoencoder_predictions = np.where(probs >= cutoff, 1, 0)
                     autoencoder_predictions = autoencoder_predictions.reshape(-1)
                     
                 logging.info('Data succesfully evaluated with Autoencoder')

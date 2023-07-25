@@ -83,7 +83,7 @@ def main(args):
     
     # Find best threshold
     logging.info('🟢🟢🟢 Finding the best cutoff for prediction')
-    autoencoder.find_best_cutoff()
+    autoencoder.find_best_cutoff(args)
     
     # Predict
     logging.info('Testing the cutoff in test dataset')
@@ -106,7 +106,7 @@ def main(args):
     
     # Find best threshold
     logging.info('🟢🟢🟢 Finding the best cutoff for prediction with SMOTE dataset')
-    autoencoder.find_best_cutoff()
+    autoencoder.find_best_cutoff(args)
     
     # Predict X_test
     logging.info('Testing the cutoff in test dataset with model trained using SMOTE')

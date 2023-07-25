@@ -407,7 +407,7 @@ class train_autoencoder:
         
         return history
     
-    def find_best_cutoff(self):
+    def find_best_cutoff(self, args):
         
         logging.info('Finding the best cutoff in the training dataset.')
         # Make predictions
@@ -427,10 +427,17 @@ class train_autoencoder:
         # Find the optimal threshold: the one that maximizes accuracy
         optimal_idx = np.argmax(accuracies)
         self.cutoff = thresholds[optimal_idx]
-        logging.info(f"""Best threshold: {self.cutoff}""")
-
+        logging.info(f'Best threshold: {self.cutoff}')
         
+        # Save cutoff
+        path_save = Path(args.output_model)
+        path_save.mkdir(parents=True, exist_ok=True)  # make dir
+        path_out = os.path.join(path_save, 'cutoff.txt')
+        
+        with open(path_out, 'w') as f:
+            f.write(str(self.cutoff))
 
+        logging.info(f'Best cutoff saved in {path_save}')
     
     def classify(self, args):
     
