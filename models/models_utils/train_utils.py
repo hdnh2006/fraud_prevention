@@ -448,7 +448,7 @@ class train_autoencoder:
         logging.info('Evaluating test dataset')
         
         # Evaluating test dataset
-        probs = self.autoencoder.predict(self.X_test_scaled, batch_size=4096)
+        probs = self.autoencoder.predict(self.X_test_scaled, batch_size=args.batch_size)
         y_pred = np.where(probs >= self.cutoff, 1, 0)
 
         logging.info(f'Confusion Matrix for this model: \n {confusion_matrix(self.y_test, y_pred)}')
