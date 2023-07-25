@@ -169,10 +169,13 @@ def upload_predict():
                 
                 # Save to CSV
                 timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-                filename = ROOT / os.path.join('deployment','results',f'predictions_{timestamp}.csv')
+                current_directory = Path(os.getcwd())
+                filename = current_directory / f'predictions_{timestamp}.csv'
+                print("HEEEEREEEE!")
+                print(filename)
                 results.to_csv(filename, index=False)
                 
-                return send_file(filename, as_attachment=True)                                                             
+                return send_file(str(filename), as_attachment=True)                                                             
         
             logging.info('Data succesfully returned to the user')
         except Exception as e:
