@@ -100,18 +100,18 @@ def main(args):
     
     if not args.avoid_optimize:
         logging.warning('⚠️ ⚠️ ⚠️ ALERT! This process can take more than one hour even in GPU')
-        best_params = tree_cls.get_best_params(X_train, y_train) # It apply XGBoost
+        best_params = tree_cls.get_best_params() # It apply XGBoost
         logging.info(f'These are the best hyperparameters for the dataset provided: \n {best_params}')
     else:
         logging.warning('🟢🟢🟢 Using the best hyperparameters gotten in the past')
         
         # The code was already ran, an these are the results:
-        best_params = {'colsample_bytree': 0.5,
+        best_params = {'colsample_bytree': 0.4,
                       'gamma': 0,
-                      'learning_rate': 0.1,
+                      'learning_rate': 0.3,
                       'max_depth': 20,
-                      'n_estimators': 100,
-                      'subsample': 1.0}
+                      'n_estimators': 300,
+                      'subsample': 0.7}
     
     xgb_best = tree_cls.train_XGBoost(name= 'XGBoost-best-params', params = best_params)
     path_save = Path(args.output_model)
