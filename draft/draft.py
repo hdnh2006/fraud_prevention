@@ -412,10 +412,20 @@ from xgboost import plot_importance
 explainer = shap.Explainer(xgb)
 
 # Calculate SHAP values
-shap_values = explainer(X_test)
+shap_values = explainer(X_train[y_train==1])
 
 # Plot SHAP values
-shap.summary_plot(shap_values, X_test)
+shap.summary_plot(shap_values, X_train[y_train==1])
+
+
+# Convert SHAP values to a DataFrame for easier export
+shap_df = pd.DataFrame(shap_values.values, columns=X_train.columns)
+
+# Export SHAP values to a CSV file (replace 'shap_values.csv' with your desired file name)
+#shap_df.to_csv('shap_values.csv', index=False)
+
+mean_shap_values = shap_df.abs().mean().sort_values(ascending=False)
+important_cols=mean_shap_values[0:8].index
 
 
 # Plot feature importance
@@ -423,14 +433,34 @@ plot_importance(xgb)
 plt.show()
 
 
+# ================= Retrain with important features by SHAP ================ #
 
+# Train the model
+X_train_smote_importance = X_train_smote.loc[:,important_cols]
+
+xgb.fit(X_train_smote_importance, y_train_smote)
+
+# Make predictions on the test set
+xgb_preds = xgb.predict(X_test.loc[:,important_cols])
+
+# Calculate the AUC-ROC score
+# xgb_auc = roc_auc_score(y_test, xgb_preds)
+
+# Show confusion matrix
+print(f'Confusion Matrix for XGBoost: \n {confusion_matrix(y_test, xgb_preds)}')
+
+# Print the AUC-ROC score
+# print(f'AUC-ROC Score for XGBoost: {xgb_auc}')
+
+# Print the classification report
+print(classification_report(y_test, xgb_preds))
 
 
 # ================== Optimal Threshold ============= #
 
 
 # Make predictions on the test set
-xgb_preds_prob = xgb.predict_proba(X_train)[:, 1]
+xgb_preds_prob = xgb.predict_proba(X_train_smote_importance)[:, 1]
 results = {}
 
 
@@ -441,20 +471,20 @@ for thres in np.arange(0, 1.05, 0.05):
 
 
     # Calculate the AUC-ROC scorexgb_aucxgb_auc
-    xgb_auc = roc_auc_score(y_train, xgb_preds)
+    xgb_auc = roc_auc_score(y_train_smote, xgb_preds)
     
     # Show confusion matrix
-    print(f'Confusion Matrix for XGBoost: \n {confusion_matrix(y_train, xgb_preds)}')
+    print(f'Confusion Matrix for XGBoost: \n {confusion_matrix(y_train_smote, xgb_preds)}')
     
     # Print the AUC-ROC score
-    print(f'AUC-ROC Score for XGBoost: {xgb_auc}')
+    #print(f'AUC-ROC Score for XGBoost: {xgb_auc}')
     
     # Print the classification report
     # print(classification_report(y_train, xgb_preds))
 
-thres = 0.35
+thres = 0.2
 
-xgb_preds_prob = xgb.predict_proba(X_test)[:, 1]
+xgb_preds_prob = xgb.predict_proba(X_test.loc[:,important_cols])[:, 1]
 xgb_preds = (xgb_preds_prob > thres).astype(int)
 
 # Calculate the AUC-ROC score

@@ -110,6 +110,26 @@ def plot_data(data, out_plots):
     plt.savefig(path_out)  # Save the plot as an image file
     logging.info(f'Plot: Top Entry Modes with Highest Number of Fraudulent Transactions has been saved in {path_out}')
     
+    
+    # Convert the 'transactionTime' column to datetime
+    data['transactionTime'] = pd.to_datetime(data['transactionTime'])
+    data['YearMonth'] = data['transactionTime'].dt.to_period('M')
+    transactions_per_month = data.groupby('YearMonth').size()
+
+    # Plotting the number of transactions per month
+    plt.figure(figsize=(10,6))
+    transactions_per_month.plot(kind='line', linestyle='-', marker='o')
+    plt.title('Number of Transactions per Month')
+    plt.xlabel('Month')
+    plt.ylabel('Number of Transactions')
+    plt.grid(True)
+    #plt.show()
+    path_out = f'{out_plots}/transactions_per_month.png'
+    plt.savefig(path_out)  # Save the plot as an image file
+    logging.info(f'Plot: Number of Transactions per Month has been saved in {path_out}')
+
+    
+    
     logging.info("Completed report plots.")
 
 
