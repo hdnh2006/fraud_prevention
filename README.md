@@ -1,4 +1,8 @@
 # Featurespace fraud prevention
+
+<a href="https://www.buymeacoffee.com/hdnh2006" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+
 This repository contains a machine learning solution for the problem of card fraud detection. A potential customer in the banking sector has approached FeatureSpace to develop a solution that can help identify fraudulent transactions and consequently improve customer satisfaction. The solution consists of a machine learning model that scores transactions based on their likelihood of being fraudulent. This scoring system aids a small team of fraud analysts to identify and review risky transactions, thereby preventing as much fraudulent activity as possible.
 
 ## Files
